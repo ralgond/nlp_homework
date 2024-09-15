@@ -15,4 +15,4 @@ https://github.com/ralgond/nlp_homework/blob/main/task4_hw1_fasttext.py
 
 https://github.com/ralgond/nlp_homework/blob/main/task5_hw1_word2vec.py
 
-这个作业的结果是一个文本，word2vec.txt，将会被用到后面的TextCNN中。
+这个作业的结果是一个文本，word2vec.txt，将会被用到后面的深度学习模型中。
