@@ -11,7 +11,7 @@ https://github.com/ralgond/nlp_homework/blob/main/task3_hw2_tfidf.py
 
 https://github.com/ralgond/nlp_homework/blob/main/task4_hw1_fasttest.py
 
-### Task4 基于深度学习的文本分类2 - Word2Vec
+### Task5 基于深度学习的文本分类2-1 - Word2Vec
 
 https://github.com/ralgond/nlp_homework/blob/main/task5_hw1_word2vec.py
 
