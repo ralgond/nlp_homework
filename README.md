@@ -9,7 +9,7 @@ https://github.com/ralgond/nlp_homework/blob/main/task3_hw2_tfidf.py
 
 ### Task4 基于深度学习的文本分类1
 
-https://github.com/ralgond/nlp_homework/blob/main/task4_hw1_fasttest.py
+https://github.com/ralgond/nlp_homework/blob/main/task4_hw1_fasttext.py
 
 ### Task5 基于深度学习的文本分类2-1 - Word2Vec
 
