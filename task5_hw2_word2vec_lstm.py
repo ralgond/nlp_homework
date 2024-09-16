@@ -36,7 +36,7 @@ torch.manual_seed(seed)
 fold_num = 10
 data_file = './data/train_set.csv'
 
-def all_data_2_fold(fold_num, num=10000):
+def all_data_2_fold(fold_num, num=200000):
     assert num % fold_num == 0
 
     fold_data = []
@@ -187,6 +187,13 @@ class TextClassifierDataset(Dataset):
         super().__init__()
         self.data = data
 
+        
+    def _get_embedding(self, id):
+        if id < w2v_embedding.shape[0]:
+            return w2v_embedding[id]
+        else:
+            return w2v_embedding[vocab.unk]
+        
     def __getitem__(self, index):
         # 每个元素是一篇最大长度为text_max_length的id, 如果不满text_max_length则追加0
         text, label = self.data['text'][index].split()[:text_max_length], self.data['label'][index]
@@ -200,7 +207,7 @@ class TextClassifierDataset(Dataset):
         # print("====>", text_id)
         text_embedding = []
         for id in text_id:
-            text_embedding.append(w2v_embedding[id])
+            text_embedding.append(self._get_embedding(id))
         
         return torch.tensor(np.array(text_embedding), dtype=torch.float, device=device), torch.tensor(label_id, dtype=torch.long, device=device)
     
@@ -236,10 +243,10 @@ class TextClassifier(nn.Module):
         return out
 
 ################################### 训练和验证 ###################################
-num_epochs = 10
+num_epochs = 50
 learning_rate = 0.001
 
-model = TextClassifier()
+model = TextClassifier().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
