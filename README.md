@@ -16,3 +16,11 @@ https://github.com/ralgond/nlp_homework/blob/main/task4_hw1_fasttext.py
 https://github.com/ralgond/nlp_homework/blob/main/task5_hw1_word2vec.py
 
 这个作业的结果是一个文本，word2vec.txt，将会被用到后面的深度学习模型中。
+
+### Task5 基于深度学习的文本分类2-2 - Word2Vec + LSTM
+
+https://github.com/ralgond/nlp_homework/blob/main/task5_hw2_word2vec_lstm.py
+
+这个作业依赖了一个word2vec.txt，地址是: https://pan.baidu.com/s/1ewlck3zwXVQuAzraZ26Euw 提取码: qbpr
+
+
