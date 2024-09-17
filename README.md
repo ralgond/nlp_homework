@@ -23,4 +23,4 @@ https://github.com/ralgond/nlp_homework/blob/main/task5_hw2_word2vec_lstm.py
 
 这个作业依赖了一个word2vec.txt，地址是: https://pan.baidu.com/s/1ewlck3zwXVQuAzraZ26Euw 提取码: qbpr
 
-
+作业的结果是94.62%。而之后的Word2Vec + LSTM + CNN、Word2Vec + LSTM + attention和Word2Vec + LSTM + self-attention都无法突破这个结果。
