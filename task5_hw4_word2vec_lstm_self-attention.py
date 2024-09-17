@@ -232,30 +232,63 @@ for batch_text, batch_label in valid_ld:
 hidden_size = 128
 num_classes = vocab.label_size
 
-# 定义Attention层
-class Attention(nn.Module):
-    def __init__(self, hidden_size):
-        super(Attention, self).__init__()
-        self.attention = nn.Linear(hidden_size, 1)
 
-    def forward(self, lstm_output):
-        # lstm_output.shape: [batch_size, seq_len, hidden_size]
-        attn_weights = torch.tanh(self.attention(lstm_output)) # shape: [batch_size, seq_len, 1]
-        attn_weights = torch.softmax(attn_weights, dim=1) # shape: [batch_size, seq_len, 1]
-        context_vector = torch.sum(attn_weights * lstm_output, dim=1) # shape: [batch_size, hidden_size]
-        return context_vector
+# 定义多头自注意力机制
+class MultiHeadSelfAttention(nn.Module):
+    def __init__(self, hidden_size, num_heads):
+        super(MultiHeadSelfAttention, self).__init__()
+        self.num_heads = num_heads
+        self.hidden_size = hidden_size
+        self.head_dim = hidden_size // num_heads
+
+        assert (
+            self.head_dim * num_heads == hidden_size
+        ), "hidden_size must be divisible by num_heads"
+
+        self.query = nn.Linear(hidden_size, hidden_size)
+        self.key = nn.Linear(hidden_size, hidden_size)
+        self.value = nn.Linear(hidden_size, hidden_size)
+        self.fc_out = nn.Linear(hidden_size, hidden_size)
+
+        self.softmax = nn.Softmax(dim=-1)
+
+    def forward(self, x):
+        batch_size, seq_len, hidden_size = x.size()
+
+        # Linear transformations for query, key, and value
+        query = self.query(x)
+        key = self.key(x)
+        value = self.value(x)
+
+        # Split into multiple heads
+        query = query.view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
+        key = key.view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
+        value = value.view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
+
+        # Scaled dot-product attention
+        attention_scores = torch.matmul(query, key.transpose(-2, -1)) / (self.head_dim ** 0.5)
+        attention_weights = self.softmax(attention_scores)
+
+        # Attention output
+        attention_output = torch.matmul(attention_weights, value)
+        attention_output = attention_output.transpose(1, 2).contiguous().view(batch_size, seq_len, hidden_size)
+
+        # Final linear layer
+        out = self.fc_out(attention_output)
+        return out
 
 class TextClassifier(nn.Module):
     def __init__(self) -> None:
         super(TextClassifier, self).__init__()
         self.lstm = nn.LSTM(input_size=w2v_embedding.shape[1], hidden_size=hidden_size, dropout=0.2, num_layers=2, bidirectional=True, batch_first=True)
-        self.attention = Attention(hidden_size * 2)
+        self.multihead_attention = MultiHeadSelfAttention(hidden_size * 2, 8)
         self.fc = nn.Linear(hidden_size * 2, num_classes)
 
     def forward(self, x):
-        lstm_output, (hn, _) = self.lstm(x)
-        context_vector = self.attention(lstm_output)
-        out = self.fc(context_vector)
+        bilstm_output, _ = self.lstm(x)  # [batch_size, seq_len, hidden_size*2]
+        attention_output = self.multihead_attention(bilstm_output)  # [batch_size, seq_len, hidden_size*2]
+        context_vector = torch.sum(attention_output, dim=1)  # 将注意力输出求和
+        out = self.fc(context_vector)  # [batch_size, num_classes]
         return out
 
 ################################### 训练和验证 ###################################
