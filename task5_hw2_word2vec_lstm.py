@@ -222,6 +222,10 @@ valid_ds = TextClassifierDataset(dev_data)
 
 valid_ld = DataLoader(valid_ds, batch_size=64, shuffle=False)
 
+test_ds = TextClassifierDataset(test_data)
+
+test_ld = DataLoader(test_ds, batch_size=64, shuffle=False)
+
 for batch_text, batch_label in valid_ld:
     print (batch_text.shape)
     print (batch_label.shape)
@@ -277,3 +281,13 @@ for epoch in range(num_epochs):
             correct += (predicted == labels_batch).sum().item()
 
     print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}, Val Loss: {val_loss/total:.4f}, Accuracy: {100 * correct / total:.2f}%')
+
+    with torch.no_grad():
+        predicted_list = []
+        for texts_batch, labels_batch in test_ld:
+            outputs = model(texts_batch)
+            _, predicted = torch.max(outputs, 1)
+            predicted_list += predicted.tolist()
+
+        out_df = pd.DataFrame({'label': predicted_list})
+        out_df.to_csv("./tmp/submit.csv", index=False)
