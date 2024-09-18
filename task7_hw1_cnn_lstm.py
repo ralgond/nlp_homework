@@ -190,7 +190,7 @@ class CNN_LSTM_Classifier(nn.Module):
         super(CNN_LSTM_Classifier, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.conv = nn.Conv2d(1, num_filters, (kernel_size, embed_size))
-        self.lstm = nn.LSTM(num_filters, hidden_size, batch_first=True)
+        self.lstm = nn.LSTM(num_filters, hidden_size, dropout=0.2, num_layers=2, bidirectional=True, batch_first=True)
         self.fc = nn.Linear(hidden_size, num_classes)
 
         # Dropout 防止过拟合
