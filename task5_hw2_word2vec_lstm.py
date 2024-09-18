@@ -9,7 +9,7 @@ from torch.utils.data import Dataset, DataLoader
 import random
 from collections import Counter
 from tqdm import tqdm
-
+from sklearn.metrics import f1_score
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)-15s %(levelname)s: %(message)s')
 
@@ -270,6 +270,10 @@ for epoch in range(num_epochs):
     val_loss = 0
     correct = 0
     total = 0
+    
+    pred_list = []
+    label_list = []
+    
     with torch.no_grad():
         for texts_batch, labels_batch in valid_ld:
             outputs = model(texts_batch)
@@ -279,8 +283,13 @@ for epoch in range(num_epochs):
             _, predicted = torch.max(outputs, 1)
             total += labels_batch.size(0)
             correct += (predicted == labels_batch).sum().item()
+            
+            pred_list += predicted.tolist()
+            label_list += labels_batch.tolist()
+            
+        f1score = f1_score(label_list, pred_list, average='macro')
 
-    print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}, Val Loss: {val_loss/total:.4f}, Accuracy: {100 * correct / total:.2f}%')
+    print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}, Val Loss: {val_loss/total:.4f}, Accuracy: {100 * correct / total:.2f}%, F1: {f1score:.4f}')
 
     with torch.no_grad():
         predicted_list = []

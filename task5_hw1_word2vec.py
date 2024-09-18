@@ -14,7 +14,7 @@ sentences = []
 for sentence in train_df['text']:
     sentences.append(sentence.split())
 
-num_features = 100     # Word vector dimensionality
+num_features = 200     # Word vector dimensionality
 num_workers = 8       # Number of threads to run in parallel
 
 model = Word2Vec(sentences, workers=num_workers, vector_size=num_features)

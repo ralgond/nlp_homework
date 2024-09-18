@@ -10,7 +10,7 @@ from torch.utils.data import Dataset, DataLoader
 import random
 from collections import Counter
 from tqdm import tqdm
-
+from sklearn.metrics import f1_score
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)-15s %(levelname)s: %(message)s')
 
@@ -237,7 +237,7 @@ def train_model(model, train_loader, val_loader, num_epochs=10, learning_rate=0.
     for epoch in range(num_epochs):
         model.train()
         train_loss = 0
-        for data, labels in train_loader:
+        for data, labels in tqdm(train_loader, total=len(train_loader)):
             optimizer.zero_grad()
             outputs = model(data)
             loss = criterion(outputs, labels)
@@ -248,6 +248,10 @@ def train_model(model, train_loader, val_loader, num_epochs=10, learning_rate=0.
         val_loss = 0
         correct = 0
         total = 0
+        
+        pred_list = []
+        label_list = []
+    
         model.eval()
         with torch.no_grad():
             for data, labels in val_loader:
@@ -258,19 +262,34 @@ def train_model(model, train_loader, val_loader, num_epochs=10, learning_rate=0.
                 _, predicted = torch.max(outputs, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
+                
+                pred_list += predicted.tolist()
+                label_list += labels.tolist()
+                
+            f1score = f1_score(label_list, pred_list, average='macro')
 
-        print(f"Epoch {epoch+1}, Train Loss: {train_loss/len(train_loader)}, Val Loss: {val_loss/len(val_loader)}, Val Accuracy: {100 * correct / total}%")
+        print(f'Epoch {epoch+1}, Train Loss: {train_loss/len(train_loader)}, Val Loss: {val_loss/len(val_loader)}, Val Accuracy: {100 * correct / total}%, F1: {f1score:.4f}')
+        
+        with torch.no_grad():
+            predicted_list = []
+            for texts_batch, labels_batch in test_ld:
+                outputs = model(texts_batch)
+                _, predicted = torch.max(outputs, 1)
+                predicted_list += predicted.tolist()
+
+            out_df = pd.DataFrame({'label': predicted_list})
+            out_df.to_csv("./tmp/submit.csv", index=False)
 
 
 
 ################################### 7. 创建模型并进行训练 ###################################
-embed_size = 128  # 嵌入层维度
-num_heads = 8  # 多头注意力的头数
-num_encoder_layers = 4  # Transformer 编码器层数
+embed_size = 192  # 嵌入层维度
+num_heads = 4  # 多头注意力的头数
+num_encoder_layers = 3  # Transformer 编码器层数
 max_len = 512  # 最大序列长度
 
-model = TransformerClassifier(vocab.word_size, embed_size, num_heads, num_encoder_layers, vocab.label_size, max_len=max_len)
+model = TransformerClassifier(vocab.word_size, embed_size, num_heads, num_encoder_layers, vocab.label_size, max_len=max_len).to(device)
 
 
 ################################### 训练模型 ###################################
-train_model(model, train_ld, valid_ld, num_epochs=10)
+train_model(model, train_ld, valid_ld, num_epochs=20)
