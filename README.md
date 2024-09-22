@@ -1,6 +1,10 @@
 # nlp_homework
 零基础入门NLP
 
+### 第一章 - 赛题背景
+
+https://tianchi.aliyun.com/competition/entrance/531810/introduction
+
 ### 第一章 - Task3 基于机器学习的文本分类
 
 https://github.com/ralgond/nlp_homework/blob/main/task3_hw1_tfidf.py
