@@ -29,10 +29,10 @@ https://github.com/ralgond/nlp_homework/blob/main/task5_hw2_word2vec_lstm.py
 
 这个作业依赖了上面提到过的word2vec.txt。
 
-作业的离线结果是94.62%（accuracy）。线上分数为0.9351。
+作业的离线结果是94.62%（accuracy）。线上分数为0.9351(F1)。
 
 ### 第六节 - Task7 基于深度学习的文本分类3-1 - CNN + LSTM
 
 https://github.com/ralgond/nlp_homework/blob/main/task7_hw1_cnn_lstm.py
 
-线上分数为0.9375。
+线上分数为0.9375(F1)。
